@@ -1,0 +1,6 @@
+localtest
+test*
+.env 
+__*
+*.log 
+TODO
