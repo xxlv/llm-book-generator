@@ -1,6 +1,7 @@
 import os 
 
 def write_file(file_path, content):
+    """Write file to path"""    
     directory = os.path.dirname(file_path)
     if not os.path.exists(directory):
         os.makedirs(directory)

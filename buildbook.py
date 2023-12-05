@@ -116,6 +116,7 @@ def main():
     parser.add_argument("--input", type=str, help="The input text for the book.")
     parser.add_argument("--location", type=str, help="The location to save the generated book.")
     parser.add_argument("--language", type=str, help="The language of the generated book.",default="english")
+    parser.add_argument("--authors", type=str, help="The author of the generated book.", default="Unknown")
 
     args = parser.parse_args()
 
@@ -125,6 +126,7 @@ def main():
     
     llm_book_gen = LLMBookGen(llm=llm, prompt=LLMBookPrompt().load_default())
     book = llm_book_gen.gen_book(args.input,language=args.language)
+    book.authors= str(args.authors).split(",") 
     MdBook(book, args.location).build()
 
 if __name__=="__main__":

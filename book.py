@@ -23,7 +23,7 @@ class Book:
         self.curr_no=0
         self.summary=summary
         self.title=title
-        self.author=author
+        self.authors=[author]
         self.chapters=[]
     
     def add_chapter(self,chapter:Chapter):

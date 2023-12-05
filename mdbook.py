@@ -1,9 +1,9 @@
 from book import Book,Chapter
 import subprocess
 import os
+import toml 
 from tool import write_file,load_file
 from log import setup_logger
-
 logger=setup_logger()
 
 class MdBook:
@@ -49,7 +49,8 @@ class MdBook:
             logger.info("An error occurred during project initialization.\n{}".format(e))
             return False
 
-    def init_summary(self):
+
+    def create(self):
         """
         Initializes the SUMMARY.md file for the mdbook project.
 
@@ -67,8 +68,14 @@ class MdBook:
             write_file(c.location, c.content)
 
         summary_file = os.path.join(self.location, "src", "SUMMARY.md")
-        logger.info(summary_file)
         write_file(summary_file, summary_content)
+
+        # Update book metadata 
+        conf_file = os.path.join(self.location, "book.toml")
+        with open(conf_file, 'r') as file:
+            data = toml.load(file)
+        data['book']['authors'] = self.book.authors
+
 
     def build(self):
         """
@@ -82,7 +89,8 @@ class MdBook:
         if not os.path.exists(self.location):
             os.makedirs(self.location)
         self.init_project()
-        self.init_summary()
+        self.create()
+
         logger.info("Building mdbook {}".format(self.book))
 
 

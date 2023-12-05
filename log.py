@@ -1,6 +1,7 @@
 import logging
 
 def setup_logger(log_file='app.log'):
+    
     logger = logging.getLogger('buildbook')
     logger.setLevel(logging.DEBUG)
 

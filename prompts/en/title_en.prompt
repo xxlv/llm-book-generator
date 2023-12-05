@@ -1,5 +1,7 @@
-The description is as follows: {input}
+Description: {input}
 
-I am planning to write a book based on the description above. Please generate titles for me in {language}. The format for the returned data is as follows:
+I'm in the process of writing a book inspired by the description above. Could you please generate a compelling title for me in English? The format for the returned data is as follows:
 
 Generated Title: Result
+
+(Kindly provide a single, captivating book title.)
