@@ -33,11 +33,11 @@ class LLMBookGen:
         title_prompt=PromptTemplate(template=title_prompt_tpl,input_variables=["input","language"])
         title_chain=LLMChain(llm=llm,prompt=title_prompt,output_key="title",verbose=verbose)
 
-        summary_prompt_tpl=self.book_prompt.summary_propmt
+        summary_prompt_tpl=self.book_prompt.summary_prompt
         summary_prompt=PromptTemplate(template=summary_prompt_tpl,input_variables=["title","language"])
         summary_chain=LLMChain(llm=llm,prompt=summary_prompt,output_key="summary",verbose=verbose)
 
-        chapter_prompt_tpl=self.book_prompt.chapter_summary_toc_prompt
+        chapter_prompt_tpl=self.book_prompt.toc_prompt
         chapter_prompt=PromptTemplate(template=chapter_prompt_tpl,input_variables=["summary","language"])
         chapter_chain=LLMChain(llm=llm,prompt=chapter_prompt,output_key="chapters",verbose=verbose)
 
@@ -95,7 +95,7 @@ def main():
     parser.add_argument("--location", type=str, help="The location to save the generated book.")
     parser.add_argument("--language", type=str, help="The language of the generated book.",default="english")
     parser.add_argument("--authors", type=str, help="The author of the generated book.", default="Unknown")
-    
+
     args = parser.parse_args()
 
     if not args.input or not args.location:
