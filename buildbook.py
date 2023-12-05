@@ -9,6 +9,7 @@ from langchain.chains import SequentialChain
 from langchain.prompts import PromptTemplate
 from tool import load_file
 import log 
+from prompt import LLMBasePrompt,LLMBookMetaPrompt
 
 load_dotenv()
 
@@ -18,32 +19,9 @@ llm = ChatOpenAI(temperature=0, model_name="gpt-3.5-turbo",timeout=120)
 logger = log.setup_logger()
 
 
-class LLMBookPrompt:
-
-    def __init__(self,title_prompt=None,summary_propmt=None,chapter_summary_toc_prompt=None,chapter_content_detail_prompt=None) -> None:
-        # Constructor to initialize the prompts
-        
-        # Gen title
-        self.title_prompt=title_prompt
-        # Gen Book summary
-        self.summary_propmt=summary_propmt
-        # Gen chapter summary
-        self.chapter_summary_toc_prompt=chapter_summary_toc_prompt
-        # Gen chapter content 
-        self.chapter_content_detail_prompt=chapter_content_detail_prompt
-
-    def load_default(self,lang="en"):
-        self.title_prompt=load_file("./prompts/{}/title_{}.prompt".format(lang,lang))
-        self.summary_propmt=load_file("./prompts/{}/summary_{}.prompt".format(lang,lang))
-        self.chapter_summary_toc_prompt=load_file("./prompts/{}/chapter_summary_toc_prompt_{}.prompt".format(lang,lang))
-        self.chapter_content_detail_prompt=load_file("./prompts/{}/chapter_content_detail_prompt_{}.prompt".format(lang,lang))
-
-        return self 
-
-
 class LLMBookGen:
 
-    def __init__(self,prompt:LLMBookPrompt,llm) -> None:
+    def __init__(self,prompt:LLMBasePrompt,llm) -> None:
         """LLMBookGen generates a book based on the prompt."""
         self.book_prompt=prompt
         self.llm=llm 
@@ -117,14 +95,14 @@ def main():
     parser.add_argument("--location", type=str, help="The location to save the generated book.")
     parser.add_argument("--language", type=str, help="The language of the generated book.",default="english")
     parser.add_argument("--authors", type=str, help="The author of the generated book.", default="Unknown")
-
+    
     args = parser.parse_args()
 
     if not args.input or not args.location:
         print("Both --input and --location are required.")
         return
     
-    llm_book_gen = LLMBookGen(llm=llm, prompt=LLMBookPrompt().load_default())
+    llm_book_gen = LLMBookGen(llm=llm, prompt=LLMBasePrompt().load())
     book = llm_book_gen.gen_book(args.input,language=args.language)
     book.authors= str(args.authors).split(",") 
     MdBook(book, args.location).build()
