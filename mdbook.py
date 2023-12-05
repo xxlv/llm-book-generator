@@ -71,11 +71,16 @@ class MdBook:
         write_file(summary_file, summary_content)
 
         # Update book metadata 
+        self.update_book_metadata()
+
+    def update_book_metadata(self):
+        """Update book metadata"""
         conf_file = os.path.join(self.location, "book.toml")
         with open(conf_file, 'r') as file:
             data = toml.load(file)
         data['book']['authors'] = self.book.authors
-
+        with open(conf_file, 'w') as file:
+            toml.dump(data, file)
 
     def build(self):
         """
