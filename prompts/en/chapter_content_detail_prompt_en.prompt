@@ -1,0 +1,9 @@
+I am writing a book about {title}, and the overall summary of the book is as follows:
+{summary}
+
+The subtitle of this chapter is {subtitle}, and the summary of this chapter is as follows:
+{subsummary}
+
+Please generate the specific content of this chapter, including examples and principles as much as possible. The format of the generated content should be as follows:
+
+Result: Generated content

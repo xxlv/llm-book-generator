@@ -7,7 +7,6 @@ from langchain.chat_models import ChatOpenAI
 from langchain.chains.llm import LLMChain
 from langchain.chains import SequentialChain
 from langchain.prompts import PromptTemplate
-
 from tool import load_file
 import log 
 
@@ -33,11 +32,11 @@ class LLMBookPrompt:
         # Gen chapter content 
         self.chapter_content_detail_prompt=chapter_content_detail_prompt
 
-    def load_default(self):
-        self.title_prompt=load_file("./prompts/title.prompt")
-        self.summary_propmt=load_file("./prompts/summary.prompt")
-        self.chapter_summary_toc_prompt=load_file("./prompts/chapter_summary_toc_prompt.prompt")
-        self.chapter_content_detail_prompt=load_file("./prompts/chapter_content_detail_prompt.prompt")
+    def load_default(self,lang="en"):
+        self.title_prompt=load_file("./prompts/{}/title_{}.prompt".format(lang,lang))
+        self.summary_propmt=load_file("./prompts/{}/summary_{}.prompt".format(lang,lang))
+        self.chapter_summary_toc_prompt=load_file("./prompts/{}/chapter_summary_toc_prompt_{}.prompt".format(lang,lang))
+        self.chapter_content_detail_prompt=load_file("./prompts/{}/chapter_content_detail_prompt_{}.prompt".format(lang,lang))
 
         return self 
 
@@ -45,7 +44,7 @@ class LLMBookPrompt:
 class LLMBookGen:
 
     def __init__(self,prompt:LLMBookPrompt,llm) -> None:
-        """LLMBookGen 根据Prompt生成Book"""
+        """LLMBookGen generates a book based on the prompt."""
         self.book_prompt=prompt
         self.llm=llm 
     
@@ -72,12 +71,10 @@ class LLMBookGen:
     
 
     def as_book(self,result,author="GPT") ->Book:
-        
         chapters=result['chapters']
         chapterslines=chapters.split("\n")
         title=result['title']
         summary=result['summary']
-
         book=Book(title=title,summary=summary,author=author)
         
         for c in chapterslines:
@@ -86,7 +83,7 @@ class LLMBookGen:
                 nu=int(seqc[0])
                 title=seqc[1]
                 summary=seqc[2]
-                # content 需要下一次gpt
+                # Content requires the next GPT session.
                 the_chapter=Chapter(nu=nu,title=title,summary=summary)
                 book.add_chapter(self.gen_chapter(the_chapter,book.title,book.summary))
 

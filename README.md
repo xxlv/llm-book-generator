@@ -2,6 +2,26 @@
 
 This script generates a book using OpenAI's GPT-3.5-turbo language model and Markdown.
 
+## Early Testing Phase Notice
+
+**Caution: This project is currently in a very early testing phase, and it includes numerous unstable APIs.**
+
+
+### Demo
+
+Explore a live demonstration of the project [here](https://llmbooks.ailove.fun/).
+
+### Overview
+
+This repository is in the initial stages of development and is not recommended for production use. The APIs provided are subject to frequent changes, and stability cannot be guaranteed. Please be aware of potential issues and unexpected behavior while testing.
+
+### Important Notes
+
+- This project is not suitable for production environments.
+- Expect frequent updates and changes to APIs.
+- Bugs and instability are likely to occur.
+
+
 ## Prerequisites
 
 Before running the script, make sure you have the required dependencies installed:

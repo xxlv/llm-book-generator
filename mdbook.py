@@ -7,11 +7,24 @@ from log import setup_logger
 logger=setup_logger()
 
 class MdBook:
-    def __init__(self,book:Book,location:str=".") -> None:
-        self.book=book  
-        self.location=location
+    def __init__(self, book: Book, location: str = ".") -> None:
+        """
+        Initializes MdBook object.
+
+        Parameters:
+        - book (Book): The Book object containing information about the book.
+        - location (str): The location where the mdbook project will be created. Default is the current directory.
+        """
+        self.book = book
+        self.location = location
 
     def check_mdbook_installation(self):
+        """
+        Checks if mdbook is installed.
+
+        Returns:
+        - bool: True if mdbook is installed, False otherwise.
+        """
         try:
             subprocess.run(["mdbook", "--version"], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             return True
@@ -19,37 +32,58 @@ class MdBook:
             return False
 
     def init_project(self):
+        """
+        Initializes the mdbook project.
+
+        Returns:
+        - bool: True if the project initialization is successful, False otherwise.
+        """
         if not self.check_mdbook_installation():
-            logger.info("请先安装 mdbook 工具。")
+            logger.info("Please install the mdbook tool first.")
             return False
         try:
-            logger.info("准备创建项目 {}".format(self.book.title))
+            logger.info("Preparing to create the project {}".format(self.book.title))
             subprocess.run(["mdbook", "init", "--title", self.book.title], check=True, cwd=self.location)
             return True
         except subprocess.CalledProcessError as e:
-            logger.info("初始化项目时发生错误。\n{}".format(e))
+            logger.info("An error occurred during project initialization.\n{}".format(e))
             return False
-        
+
     def init_summary(self):
+        """
+        Initializes the SUMMARY.md file for the mdbook project.
+
+        Creates the SUMMARY.md file based on the chapters in the book.
+
+        Returns:
+        - None
+        """
         # Summary
-        summary_content="# Summary\n"
+        summary_content = "# Summary\n"
         for c in self.book.chapters:
-            chapter_filename=os.path.join("chapters","{}.md".format(c.nu))
-            summary_content+="- [{}]({}) \n".format(c.title,chapter_filename)
-            c.update_location(os.path.join(self.location,"src",chapter_filename))
-            write_file(c.location,c.content)
+            chapter_filename = os.path.join("chapters", "{}.md".format(c.nu))
+            summary_content += "- [{}]({}) \n".format(c.title, chapter_filename)
+            c.update_location(os.path.join(self.location, "src", chapter_filename))
+            write_file(c.location, c.content)
 
-        summary_file=os.path.join(self.location,"src","SUMMARY.md")
+        summary_file = os.path.join(self.location, "src", "SUMMARY.md")
         logger.info(summary_file)
-        write_file(summary_file,summary_content)
-
+        write_file(summary_file, summary_content)
 
     def build(self):
+        """
+        Builds the mdbook project.
+
+        Initializes the project, creates the SUMMARY.md file, and builds the mdbook project.
+
+        Returns:
+        - None
+        """
         if not os.path.exists(self.location):
             os.makedirs(self.location)
         self.init_project()
         self.init_summary()
-        logger.info("构建mdbook {}".format(self.book))
+        logger.info("Building mdbook {}".format(self.book))
 
 
 if __name__=="__main__":
