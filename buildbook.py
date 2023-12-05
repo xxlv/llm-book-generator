@@ -49,23 +49,23 @@ class LLMBookGen:
         self.llm=llm 
     
     
-    def gen_book(self,input:str,verbose=True):
+    def gen_book(self,input:str,language:str="english",verbose=True):
         
         title_prompt_tpl=self.book_prompt.title_prompt
-        title_prompt=PromptTemplate(template=title_prompt_tpl,input_variables=["input"])
+        title_prompt=PromptTemplate(template=title_prompt_tpl,input_variables=["input","language"])
         title_chain=LLMChain(llm=llm,prompt=title_prompt,output_key="title",verbose=verbose)
 
         summary_prompt_tpl=self.book_prompt.summary_propmt
-        summary_prompt=PromptTemplate(template=summary_prompt_tpl,input_variables=["title"])
+        summary_prompt=PromptTemplate(template=summary_prompt_tpl,input_variables=["title","language"])
         summary_chain=LLMChain(llm=llm,prompt=summary_prompt,output_key="summary",verbose=verbose)
 
         chapter_prompt_tpl=self.book_prompt.chapter_summary_toc_prompt
-        chapter_prompt=PromptTemplate(template=chapter_prompt_tpl,input_variables=["summary"])
+        chapter_prompt=PromptTemplate(template=chapter_prompt_tpl,input_variables=["summary","language"])
         chapter_chain=LLMChain(llm=llm,prompt=chapter_prompt,output_key="chapters",verbose=verbose)
 
         # core chain 
-        core_chain=SequentialChain(chains=[title_chain,summary_chain,chapter_chain],input_variables=["input"], output_variables=["title","summary","chapters"])
-        result=core_chain({"input":input})
+        core_chain=SequentialChain(chains=[title_chain,summary_chain,chapter_chain],input_variables=["input","language"], output_variables=["title","summary","chapters","language"])
+        result=core_chain({"input":input,"language":language})
 
         return self.as_book(result) 
     
@@ -75,6 +75,8 @@ class LLMBookGen:
         chapterslines=chapters.split("\n")
         title=result['title']
         summary=result['summary']
+        language=result['language']
+
         book=Book(title=title,summary=summary,author=author)
         
         for c in chapterslines:
@@ -85,16 +87,16 @@ class LLMBookGen:
                 summary=seqc[2]
                 # Content requires the next GPT session.
                 the_chapter=Chapter(nu=nu,title=title,summary=summary)
-                book.add_chapter(self.gen_chapter(the_chapter,book.title,book.summary))
+                book.add_chapter(self.gen_chapter(the_chapter,book.title,book.summary,language=language))
 
         return book
 
-    def gen_chapter(self,chapter:Chapter,book_title:str,book_summary:str):
+    def gen_chapter(self,chapter:Chapter,book_title:str,book_summary:str,language:str):
         promot_tpl=self.book_prompt.chapter_content_detail_prompt
-        prompt=PromptTemplate(template=promot_tpl,input_variables=["title","summary","subtitle","subsummary"])
+        prompt=PromptTemplate(template=promot_tpl,input_variables=["title","summary","subtitle","subsummary","language"])
 
         title_chain=LLMChain(llm=llm,prompt=prompt,output_key="content",verbose=True)
-        result=title_chain({"title":book_title,"summary":book_summary,"subtitle":chapter.title,"subsummary":chapter.summary})
+        result=title_chain({"title":book_title,"summary":book_summary,"subtitle":chapter.title,"subsummary":chapter.summary,"language":language})
         if "content" in result:
             chapter.content=self._parse_content(result["content"])
         else:
@@ -113,6 +115,7 @@ def main():
     parser = argparse.ArgumentParser(description="Generate and build a book using LLM and Markdown.")
     parser.add_argument("--input", type=str, help="The input text for the book.")
     parser.add_argument("--location", type=str, help="The location to save the generated book.")
+    parser.add_argument("--language", type=str, help="The language of the generated book.",default="english")
 
     args = parser.parse_args()
 
@@ -121,7 +124,7 @@ def main():
         return
     
     llm_book_gen = LLMBookGen(llm=llm, prompt=LLMBookPrompt().load_default())
-    book = llm_book_gen.gen_book(args.input)
+    book = llm_book_gen.gen_book(args.input,language=args.language)
     MdBook(book, args.location).build()
 
 if __name__=="__main__":

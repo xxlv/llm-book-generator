@@ -1,5 +1,5 @@
 The description is as follows: {input}
 
-I am planning to write a book based on the description above. Please generate titles for me. The format for the returned data is as follows:
+I am planning to write a book based on the description above. Please generate titles for me in {language}. The format for the returned data is as follows:
 
-Generated Title Result
+Generated Title: Result
