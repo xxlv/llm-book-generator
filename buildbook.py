@@ -70,7 +70,7 @@ class LLMBookGen:
         return book
 
     def gen_chapter(self,chapter:Chapter,book_title:str,book_summary:str,language:str):
-        promot_tpl=self.book_prompt.chapter_content_detail_prompt
+        promot_tpl=self.book_prompt.content_detail_prompt
         prompt=PromptTemplate(template=promot_tpl,input_variables=["title","summary","subtitle","subsummary","language"])
 
         title_chain=LLMChain(llm=llm,prompt=prompt,output_key="content",verbose=True)
