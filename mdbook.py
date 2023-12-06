@@ -96,7 +96,7 @@ class MdBook:
         self.init_project()
         self.create()
 
-        logger.info("Building mdbook {}".format(self.book))
+        logger.info("Building mdbook {}".format(self.book.title))
 
 
 if __name__=="__main__":
