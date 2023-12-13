@@ -1,5 +1,4 @@
 localtest
-test*
 .env 
 __*
 *.log 

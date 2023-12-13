@@ -9,7 +9,8 @@ from langchain.chains import SequentialChain
 from langchain.prompts import PromptTemplate
 from tool import load_file
 import log 
-from prompt import LLMBasePrompt,LLMBookMetaPrompt
+from prompt import LLMBasePrompt
+from config import BuildConfig
 
 load_dotenv()
 
@@ -21,10 +22,11 @@ logger = log.setup_logger()
 
 class LLMBookGen:
 
-    def __init__(self,prompt:LLMBasePrompt,llm) -> None:
+    def __init__(self,prompt:LLMBasePrompt,conf,llm) -> None:
         """LLMBookGen generates a book based on the prompt."""
         self.book_prompt=prompt
         self.llm=llm 
+        self.conf=conf 
     
     
     def gen_book(self,input:str,language:str="english",verbose=True):
@@ -95,6 +97,7 @@ def main():
     parser.add_argument("--location", type=str, help="The location to save the generated book.")
     parser.add_argument("--language", type=str, help="The language of the generated book.",default="english")
     parser.add_argument("--authors", type=str, help="The author of the generated book.", default="Unknown")
+    parser.add_argument("--config", type=str, help="Specify the name of the config file.", default="buildbook.json")
 
     args = parser.parse_args()
 
@@ -102,7 +105,8 @@ def main():
         print("Both --input and --location are required.")
         return
     
-    llm_book_gen = LLMBookGen(llm=llm, prompt=LLMBasePrompt().load())
+    conf=BuildConfig.from_file(args.config)
+    llm_book_gen = LLMBookGen(llm=llm, prompt=LLMBasePrompt().load(conf=conf),conf=conf)
     book = llm_book_gen.gen_book(args.input,language=args.language)
     book.authors= str(args.authors).split(",") 
     MdBook(book, args.location).build()

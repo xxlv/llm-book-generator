@@ -1,0 +1,8 @@
+{
+    "minLevel": 1,
+    "maxLevel": 2,
+    "minChapter": 1,
+    "maxChapter": 5,
+    "minSize": 10000,
+    "maxSize": 10000
+}
